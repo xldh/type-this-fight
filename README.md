@@ -1,6 +1,6 @@
-type-this-fight
+Type-This-Fight
 
 ===============
 
 
-A game about keyboard, fights and robots.
+A game about nodejs keyboard, fights and robots.

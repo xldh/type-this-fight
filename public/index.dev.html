@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Type This Fight</title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" type="text/css" href="css/main.css" />
+    </head>
+    <body>
+        <div id="main">
+            <div id="left-col-1-3">
+                <div class="chat-box">
+                    <div>
+                        <output id="chat"></output>
+                    </div>
+                    <form>
+                        <textarea readonly id="chat-input" placeholder="Please wait while connecting..."></textarea>
+                    </form>
+                </div>
+            </div>
+            <div id="right-col-2-3">
+                <div class="canvas-box">
+                    <canvas id="TheCanvasWhoSaysNi">NI!</canvas>
+                </div>
+                <div class="terminal-box">
+                    <output id="terminal"></output>
+                    <form>
+                    <textarea readonly id="terminal-input"></textarea>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="js/core.js"></script>
+    <script type="text/javascript" src="js/EventSpeakerClass.js"></script>
+    <script type="text/javascript" src="js/CanvasBoxClass.js"></script>
+    <script type="text/javascript" src="js/RobotClass.js"></script>
+    <script type="text/javascript" src="js/RobotControllerClass.js"></script>
+    <script type="text/javascript" src="js/DOMHandlerClass.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+</html>

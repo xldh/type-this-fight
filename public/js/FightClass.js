@@ -1,0 +1,3 @@
+var FightClass = Class.extend({
+    
+});

@@ -59,8 +59,8 @@
         console.log(data);
         console.log('</connected>');
         
-        nick = "user#" + data.userId;
-        userId = data.userId;
+        nick = data.nick;
+        console.log(data);
         isPlayer = data.isPlayer;
         
         console.log('Constructing robots!');
@@ -211,9 +211,10 @@
         (gGame.robots[data.robotId]).exec(data.command);
      }); 
     // NO OTHER CHOICE BUT TO LEAVE THAT PIECE OF CODE HERE
-    document.body.onbeforeunload = function () {
+    window.addEventListener('beforeunload', function () {
         if (socket) {
-            socket.emit('preparingToUnload');
         }
-    };
+    }, false);
+    
+    socket.emit('leave', {});
 }());

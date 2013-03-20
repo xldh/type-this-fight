@@ -4,12 +4,14 @@ var http = require("http"),
     fs = require("fs"),
     app = express(),
     server = null,
+    nickPool = ['Robert', 'Joey', 'Tommy', 'NachoCheese'],
     config = JSON.parse(fs.readFileSync('config.json', 'utf-8')),
     node_env = config.NODE_ENV || 'dev',
 //////////////////////////////
 //  SERVER GLOBAL VARIABLES //
     messages = [],          //
-    robots = {},            //
+    clients = {},            //
+    robots = {length: 0},   //
     id = -1;                //
 //////////////////////////////
 // configure express
@@ -48,19 +50,24 @@ io.configure('dev', function(){
 server.listen(process.env.PORT || 1337);
 // configure socket events
 io.sockets.on('connection', function (socket) {
+    var connectionData = {},
+        nick = nickPool[~~(Math.random() * (nickPool.length - 1))],
+        robot;
+    
+    clients[socket.id] = socket;
+    
     console.log('<connection>');
     console.log(socket.id);
     console.log('</connection>');
-    var connectionData = {},
-        robot;
-    
-    socket.userId = id;
+    console.log('');
+    connectionData.nick = nick;
     connectionData.isPlayer = false;
-    // searching a robot sharing socket's sessionId
-    if (robots.hasOwnProperty(socket.sessionId)) {
-        robot = robots[socket.sessionId];
+    // searching a robot sharing socket's id
+    if (robots.hasOwnProperty(socket.id)) {
+        console.log('Found a robot corresponding to id: ' + socket.id);
+        robot = robots[socket.id];
     }
-    if (!robot && robots.length < 2) { // We can assign the player a robotId so that he/she can play
+    if (robot === undefined && robots.length < 2) { // We can assign the player a robotId so that he/she can play
         id++;
         connectionData.isPlayer = true;
         connectionData.playerRobotId = id;
@@ -74,16 +81,16 @@ io.sockets.on('connection', function (socket) {
             lowerDef: 0,
             delay: 2.0
         };
-         // robot sent to client must not store sessionId
-        socket.broadcast.emit('newPlayerJoined', robot);
+         // robot sent to client must not store id
+        socket.broadcast.emit('newPlayerJoined', connectionData);
+        robots[socket.id] = robot;
+        robots.length++;
         
-        robots[socket.sessionId] = robot;
     } else if (robot) {
         socket.broadcast.emit('playerReconnected', {robotId: robot.id});
     } else { // Spectator user
-        socket.broadcast.emit('newSpectatorJoined', socket.userId);
+        socket.broadcast.emit('newSpectatorJoined', nick);
     }
-    
     /**
      * data.playerId
      * data.robotId
@@ -106,21 +113,23 @@ io.sockets.on('connection', function (socket) {
         console.log(data);
         console.log('</leave>');
         if (data.robotId !== null) {
-            robots.er
+            //robots.e
         }
         socket.broadcast.emit('userLeft');
         socket.disconnect();
+    });
+    socket.on('disconnect', function () {
+        delete clients[socket.id];
     });
     socket.on('newMessage', function (data) {
         messages.push(data);
         console.log('newMessage: "' + data.msg + '" from: "' + data.nick + '"');
         socket.broadcast.emit('getNewMessage', data);
     });
-    
     connectionData.messages = messages;
     connectionData.robots = robots;
-    connectionData.nick = "user#" + socket.userId;
-    connectionData.userId = socket.userId;
+    connectionData.nick = nick;
+    connectionData.userId = id;
     connectionData.isPlayer = connectionData.isPlayer;
     socket.emit('connected', connectionData);
 });

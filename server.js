@@ -105,20 +105,14 @@ io.sockets.on('connection', function (socket) {
         socket.emit('commandSuccessfullyBroadcast', data.command);
     });
     
-    /**
-     * @var {Number|void} data.robotId
-     */
-    socket.on('leave', function (data) {
-        console.log('<leave>');
-        console.log(data);
-        console.log('</leave>');
-        if (data.robotId !== null) {
-            //robots.e
-        }
-        socket.broadcast.emit('userLeft');
-        socket.disconnect();
-    });
     socket.on('disconnect', function () {
+    	console.log('<disconnect />');
+        socket.broadcast.emit('userLeft');
+        if (robots[socket.id]) {
+        	console.log('deleting robot');
+        	delete robots[socket.id];
+        	robots.length -= 1;
+        }
         delete clients[socket.id];
     });
     socket.on('newMessage', function (data) {

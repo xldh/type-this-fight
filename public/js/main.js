@@ -209,12 +209,5 @@
         console.log('</getCommandSent>');
         
         (gGame.robots[data.robotId]).exec(data.command);
-     }); 
-    // NO OTHER CHOICE BUT TO LEAVE THAT PIECE OF CODE HERE
-    window.addEventListener('beforeunload', function () {
-        if (socket) {
-        }
-    }, false);
-    
-    socket.emit('leave', {});
+     });
 }());

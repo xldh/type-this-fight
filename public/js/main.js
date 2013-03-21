@@ -64,11 +64,11 @@
         isPlayer = data.isPlayer;
         
         console.log('Constructing robots!');
-        gGame.robots = (function () {
+        robots = (function () {
             var a = [],
                 robot = null;
-            for (var key in gGame.robots) {
-                if (gGame.robots.hasOwnProperty(key)) {
+            for (var key in data.robots) {
+                if (robots.hasOwnProperty(key)) {
                     a.push(
                         new RobotClass(
                             robot.id,
@@ -84,6 +84,9 @@
             }
             return a;
         }());
+        
+        console.log(robots);
+        console.log(gGame.robots);
         
         if (isPlayer) {
             console.log('Building robot controller!');

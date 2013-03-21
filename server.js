@@ -50,6 +50,21 @@ io.configure('dev', function(){
 server.listen(process.env.PORT || 1337);
 // configure socket events
 io.sockets.on('connection', function (socket) {
+	/**
+	 * Flattens an  object to an indexed array 
+	 * 
+	 * @returns {Array} 
+	 */
+	function flatten (object) {
+		var a = [],
+			l = 0;
+		for (var key in object) {
+			if (key !== 'length' && object.hasOwnProperty(key)) {
+				a[(l++)] = object[key];
+			}
+		}
+		return a;
+	}
     var connectionData = {},
         nick = nickPool[~~(Math.random() * (nickPool.length - 1))],
         robot;
@@ -82,7 +97,10 @@ io.sockets.on('connection', function (socket) {
             delay: 2.0
         };
          // robot sent to client must not store id
+         
+        connectionData.robot = robot
         socket.broadcast.emit('newPlayerJoined', connectionData);
+        
         robots[socket.id] = robot;
         robots.length++;
         
@@ -121,7 +139,11 @@ io.sockets.on('connection', function (socket) {
         socket.broadcast.emit('getNewMessage', data);
     });
     connectionData.messages = messages;
-    connectionData.robots = robots;
+    connectionData.robots = flatten(robots);
+    connectionData.robots.sort(function (a, b) {
+    	return (a.id < b.id) ? -1 : 1;
+    });
+    console.log(connectionData.robots);
     connectionData.nick = nick;
     connectionData.userId = id;
     connectionData.isPlayer = connectionData.isPlayer;

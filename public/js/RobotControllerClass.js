@@ -9,32 +9,32 @@ var RobotControllerClass = Class.extend({
     robotId: null,
     isLocked: false,
     lockInput: function () {
-        this.isLocked = true;
-        this.input.setAttribute('readonly', 'readonly');
+        gGame.player.robotController.isLocked = true;
+        gGame.player.robotController.input.setAttribute('readonly', 'readonly');
     },
     unlockInput: function () {
-        this.isLocked = false;
-        this.input.removeAttribute('readonly');
+        gGame.player.robotController.isLocked = false;
+        gGame.player.robotController.input.removeAttribute('readonly');
     },
     init: function (inputId, robotId) {
-        this.input = document.getElementById(inputId);
-        if (Object.prototype.toString.call(this.input)
+        gGame.player.robotController.input = document.getElementById(inputId);
+        if (Object.prototype.toString.call(gGame.player.robotController.input)
         !== '[object HTMLTextAreaElement]') {
             throw new Error('Input element not found with id: "' + inputId + '"');
         }
-        this.robotId = robotId;
+        gGame.player.robotController.robotId = robotId;
     },
     broadcastCommand: function (cmd) {
         console.log('Emit <commandSent>');
         gSocket.emit('commandSent', {
             playerId: gSocket.userId,
             command: cmd,
-            robotId: this.robotId
+            robotId: gGame.player.robotController.robotId
         });
     },
     _transmitCommandToRobot: function (cmd) {
-        if (this.robotId !== null) {
-            (gGame.robots[this.robotId]).exec(cmd);
+        if (gGame.player.robotController.robotId !== null) {
+            (gGame.robots[gGame.player.robotController.robotId]).exec(cmd);
         }
     }
 });

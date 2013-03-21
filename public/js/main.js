@@ -14,7 +14,6 @@
      * 
      *********************************************/
     var socket = window.gSocket,
-        robots = window.gGame.robots,
         player = window.gGame.player,
         canvasBox = new CanvasBoxClass('TheCanvasWhoSaysNi'),
         DOMHandler = new DOMHandlerClass(),
@@ -64,20 +63,22 @@
         isPlayer = data.isPlayer;
         
         console.log('Constructing robots!');
-        robots = (function () {
+        console.log(data.robots);
+        gGame.robots = (function () {
             var a = [],
-                robot = null;
+                robotData = null;
             for (var key in data.robots) {
-                if (robots.hasOwnProperty(key)) {
+                if (typeof data.robots[key] === 'object') {
+                	robotData = data.robots[key];
                     a.push(
                         new RobotClass(
-                            robot.id,
-                            robot.life,
-                            robot.att,
-                            robot.def,
-                            robot.lowerDef,
-                            robot.upperDef,
-                            robot.delay
+                            robotData.id,
+                            robotData.life,
+                            robotData.att,
+                            robotData.def,
+                            robotData.lowerDef,
+                            robotData.upperDef,
+                            robotData.delay
                         )
                     );
                 }
@@ -85,7 +86,6 @@
             return a;
         }());
         
-        console.log(robots);
         console.log(gGame.robots);
         
         if (isPlayer) {
@@ -197,6 +197,9 @@
                 data.delay
             )
         );
+        gGame.robots.sort(function (a, b) {
+        	return (a.playerRobotId < b.playerRobotId) ? -1 : 1;
+        });
     });
     socket.on('getNewSpectatorJoined', function (nick) {
         outputToChat({nick: '[INFO]', msg: nick + ' a rejoint le chat en tant que spectateur'});

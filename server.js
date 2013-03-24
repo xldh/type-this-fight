@@ -97,9 +97,8 @@ io.sockets.on('connection', function (socket) {
             delay: 2.0
         };
          // robot sent to client must not store id
-         
-        connectionData.robot = robot
-        socket.broadcast.emit('newPlayerJoined', connectionData);
+        connectionData.robot = robot;
+        socket.broadcast.emit('getNewPlayerJoined', robot);
         
         robots[socket.id] = robot;
         robots.length++;
@@ -125,7 +124,8 @@ io.sockets.on('connection', function (socket) {
     
     socket.on('disconnect', function () {
     	console.log('<disconnect />');
-        socket.broadcast.emit('userLeft');
+    	var robotId = robots[socket.id] ? robots[socket.id].id : false;
+        socket.broadcast.emit('userLeft', robotId);
         if (robots[socket.id]) {
         	console.log('deleting robot');
         	delete robots[socket.id];
@@ -133,16 +133,19 @@ io.sockets.on('connection', function (socket) {
         }
         delete clients[socket.id];
     });
+    
     socket.on('newMessage', function (data) {
         messages.push(data);
         console.log('newMessage: "' + data.msg + '" from: "' + data.nick + '"');
         socket.broadcast.emit('getNewMessage', data);
     });
+    
     connectionData.messages = messages;
     connectionData.robots = flatten(robots);
     connectionData.robots.sort(function (a, b) {
     	return (a.id < b.id) ? -1 : 1;
     });
+    
     console.log(connectionData.robots);
     connectionData.nick = nick;
     connectionData.userId = id;

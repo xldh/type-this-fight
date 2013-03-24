@@ -1,4 +1,4 @@
-(function () {
+window.onload = (function () {
     "use strict";
     window.gSocket = io.connect('', { 'sync disconnect on unload': true });
     window.gGame = {
@@ -14,7 +14,6 @@
      * 
      *********************************************/
     var socket = window.gSocket,
-        player = window.gGame.player,
         canvasBox = new CanvasBoxClass('TheCanvasWhoSaysNi'),
         DOMHandler = new DOMHandlerClass(),
         chatInput = document.getElementById('chat-input'),
@@ -90,12 +89,8 @@
         
         if (isPlayer) {
             console.log('Building robot controller!');
-            player.robotController = new RobotControllerClass(
-                terminalInput.id,
-                data.userId
-            );
-            socket.on('commandSuccessfullyBroadcast',
-                      player.robotController._transmitCommandToRobot);
+            gGame.player.robotController = new RobotControllerClass(terminalInput.id, data.userId);
+            socket.on('commandSuccessfullyBroadcast', gGame.player.robotController._transmitCommandToRobot);
         } else {
             console.log(
                 'No more robot controllers available, you can watch though!'
@@ -135,7 +130,7 @@
                 if (e.keyCode === 13) {
                     cmd = (terminalInput.value.trim()).replace(/\n/g, '');
                     if (cmd !== '') {
-                        player.robotController.broadcastCommand(cmd);
+                        gGame.player.robotController.broadcastCommand(cmd);
                     }
                     clearInput(terminalInput);
                     return false;
@@ -159,11 +154,23 @@
         console.log('<preparingToUnload />');
         socket.emit('leave', {isPlayer: isPlayer, userId: userId});
     });
-    socket.on('userLeft', function (data) {
+    socket.on('userLeft', function (robotId) {
         console.log('<userLeft>');
-        console.log(data);
+        console.log(robotId);
         console.log('</userLeft>');
-        
+        if (robotId !== false) {
+	        var index;
+	        gGame.robots.map(function (robot, key) {
+	        	if (robot.id == robotId) {
+	        		index = key;
+	        	}
+	        });
+	        if (index !== undefined) {
+	        	gGame.robots.splice(index, 1);
+	        } else {
+	        	throw new Error('Could not find any robot with given id: "' +  robotId + '"');
+	        }
+        }
     });
     socket.on('getNewMessage', function (data) {
         console.log('<getNewMessage>');
@@ -173,7 +180,7 @@
         outputToChat(data);
     });
     /**
-     * data.playerRobotId,
+     * data.id,
      * data.life,
      * data.att,
      * data.def,
@@ -186,9 +193,12 @@
         console.log(data);
         console.log('</newPlayerJoined>');
         
+        if (gGame.robots[0]) {
+        	gGame.robots[0].rivalId = data.id;
+        }
         gGame.robots.push(
             new RobotClass(
-                data.playerRobotId,
+                data.id,
                 data.life,
                 data.att,
                 data.def,
@@ -197,6 +207,9 @@
                 data.delay
             )
         );
+        
+        gGame.robots[1].rivalId = gGame.robots[0].id;
+        
         gGame.robots.sort(function (a, b) {
         	return (a.playerRobotId < b.playerRobotId) ? -1 : 1;
         });
@@ -213,7 +226,11 @@
         console.log('<getCommandSent>');
         console.log(data);
         console.log('</getCommandSent>');
-        
-        (gGame.robots[data.robotId]).exec(data.command);
+        var index;
+        for (var i = 0, l = gGame.robots.length; i < l; i++) {
+        	if (gGame.robots[i].id === data.robotId) {
+        		gGame.robots[i].exec(data.command);
+        	}
+        }
      });
 }());

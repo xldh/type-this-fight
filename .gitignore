@@ -1,3 +1,4 @@
 .project
 .pydevproject
 config.json
+public/js/compiled/app.js

@@ -85,6 +85,10 @@ window.onload = (function () {
             return a;
         }());
         
+        if (gGame.robots.length === 2) {
+        	gGame.robots[0].rivalId = gGame.robots[1].id;
+        	gGame.robots[1].rivalId = gGame.robots[0].id;
+        }
         console.log(gGame.robots);
         
         if (isPlayer) {
@@ -232,5 +236,11 @@ window.onload = (function () {
         		gGame.robots[i].exec(data.command);
         	}
         }
+     });
+     
+     socket.on('winner', function (robotId) {
+     	console.log('<winner>');
+        console.log(robotId);
+        console.log('</winner>');
      });
 }());

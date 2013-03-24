@@ -22,6 +22,7 @@ print("OS detected: %s" % sys.platform)
 
 html_file = None
 html_file_dirname = None
+compiled_file_path = None
 included_script_pattern = "(<script((?!src).)*(src=\"/?([^\"]*)\"|[^>]*)>)"
 js_file = None
 js_success_count = 0
@@ -30,19 +31,23 @@ js_fail_count = 0
 try:
     html_file = open(args[0], 'r')
     html_file_dirname = os.path.dirname(args[0])
+    compiled_file_path = html_file_dirname + "/js/compiled/" + "app.js"
 except:
     print "Couldn't open file, check if path is correct and try again"
     exit(1)
 
 file_data = html_file.read()
+# delete previous compiled file
+open(compiled_file_path, 'w').close()
+
 for included_script in re.finditer(included_script_pattern, file_data):
     script_file_path = included_script.group(4)
     print ("Reading file %s" % script_file_path)
     if script_file_path is not None:
         try:
             script_file_path = html_file_dirname + "/" + script_file_path
-            js_file = open(script_file_path)            
-            js_compiled_file = open(html_file_dirname + "/" + "compiled.js", 'a+')
+            js_file = open(script_file_path)
+            js_compiled_file = open(compiled_file_path, 'a+')
             js_compiled_file.write(js_file.read())
             js_compiled_file.close()
             del js_compiled_file
@@ -52,5 +57,5 @@ for included_script in re.finditer(included_script_pattern, file_data):
             js_fail_count = js_fail_count + 1
 if js_fail_count > 0:
     print("%d file(s) failed loading, thus not compiled" % js_fail_count)
-print("%d file(s) compiled" % js_success_count)
+print("%d file(s) compiled to file %s" % (js_success_count, compiled_file_path))
 print("Exit")

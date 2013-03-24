@@ -44,7 +44,7 @@ var RobotClass = Class.extend({
     },
     defend: function (zone) {
     	console.log('zone: "' + zone + '"');
-    	var defBonus = ~~(Math.random() * 3);
+    	var defBonus = 2;
     	switch (zone) {
 		case 'lower':
 			this.lowerDef += defBonus;

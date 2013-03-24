@@ -147,6 +147,10 @@ window.onload = (function () {
         terminalInput.removeAttribute('readonly');
         terminalInput.placeholder = "Type in to fight...";
     });
+    /**
+     * Happens if a player's connection was previously broken
+     *  And reconnects
+     */
     socket.on('playerReconnected', function(robotId) {
         console.log('<playerReconnected>');
         console.log(robotId);
@@ -184,6 +188,7 @@ window.onload = (function () {
         outputToChat(data);
     });
     /**
+     * Happens after first connection, when a new player joins the game
      * data.id,
      * data.life,
      * data.att,
@@ -218,6 +223,10 @@ window.onload = (function () {
         	return (a.playerRobotId < b.playerRobotId) ? -1 : 1;
         });
     });
+    /**
+     * Happens when a new spectator joins the game
+     * 
+     */
     socket.on('getNewSpectatorJoined', function (nick) {
         outputToChat({nick: '[INFO]', msg: nick + ' a rejoint le chat en tant que spectateur'});
     });
@@ -234,6 +243,7 @@ window.onload = (function () {
         for (var i = 0, l = gGame.robots.length; i < l; i++) {
         	if (gGame.robots[i].id === data.robotId) {
         		gGame.robots[i].exec(data.command);
+        		break;
         	}
         }
      });

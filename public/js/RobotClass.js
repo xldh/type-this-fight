@@ -24,25 +24,38 @@ var RobotClass = Class.extend({
     },
     attack: function (rivalId, zone) {
     	console.log('rivalId: "' + rivalId + '" zone: "' + zone + '"');
+    	var rival = RobotClass.find(rivalId),
+    		damage;
     	switch (zone) {
 		case 'lower':
+			damage = this.att - rival.lowerDef;
 			break;
 		case 'upper':
+			damage = this.att - rival.upperDef;
 			break;
 		default:
 			break;
     	}
+    	rival.life -= (damage >= 0) ? damage : 0;
+    	if (rival.life <= 0) {
+    		gSocket.emit('winner', this.id);
+    	}
+    	return damage;
     },
     defend: function (zone) {
     	console.log('zone: "' + zone + '"');
+    	var defBonus = ~~(Math.random() * 3);
     	switch (zone) {
 		case 'lower':
+			this.lowerDef += defBonus;
 			break;
 		case 'upper':
+			this.upperDef += defBonus;
 			break;
 		default:
 			break;
     	}
+    	return defBonus;
     },
     /**
      * Executes a given command
@@ -50,9 +63,8 @@ var RobotClass = Class.extend({
      */
     exec: function (cmd) {
         console.log('exec("' + cmd + '")');
-        ((RobotClass.availableCommands())[cmd]
-        || (function () { throw new Error('Invalid command'); }()))
-            .apply(this, [this.id, this.rivalId]);
+        var fn = ((RobotClass.availableCommands())[cmd] || (function () { throw new Error('Invalid command'); }()))
+        console.log(fn(this.id, this.rivalId));
     },
     setRivalId: function (rivalId) {
         this.rivalId = rivalId;
@@ -65,25 +77,25 @@ RobotClass.availableCommands = function () {
         'att upper': function (selfId, rivalId) {
             robot = RobotClass.find(selfId);
             if (robot) {
-            	robot.attack(rivalId, 'upper');
+            	return robot.attack(rivalId, 'upper');
             }
         },
         'att lower': function (selfId, rivalId) {
             robot = RobotClass.find(selfId);
             if (robot) {
-            	robot.attack(rivalId, 'lower');
+            	return robot.attack(rivalId, 'lower');
             }
         },
         'def upper': function (selfId) {
             robot = RobotClass.find(selfId);
             if (robot) {
-            	robot.defend('upper');
+            	return robot.defend('upper');
             }
         },
         'def lower': function (selfId) {
             robot = RobotClass.find(selfId);
             if (robot) {
-            	robot.defend('lower');
+            	return robot.defend('lower');
             }
         }
     };

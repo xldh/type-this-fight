@@ -163,3 +163,93 @@ newGuid_short = function () {
 	};
 	return (S4()).toString();
 };
+
+EventSpeakerClass = {
+	listeners: [],
+    dispatch: function (eventName, data) {
+        EventSpeakerClass.listeners.map(function (listener) {
+            if (listener.eventName === eventName) {
+                dispatchEvent(new CustomEvent(eventName, data));
+            }
+        });
+    },
+    listen: function (eventName, callback) {
+        addEventListener(eventName, callback);
+        EventSpeakerClass.listeners.push({eventName: eventName,  callback: callback});
+    },
+    stopListening: function (eventName, callback) {
+        removeEventListener(eventName, callback);
+        EventSpeakerClass.listeners.some(function (listener, key) {
+            if (listener.eventName === eventName
+            &&  listener.callback === callback) {
+                EventSpeakerClass.listeners();
+            }
+        });
+    }
+};
+
+Model = Class.extend({
+	/**
+	 * @member {Array.<Object>} _items A collection of objects
+	 */
+	_items: null,
+	
+	/**
+	 * @member {int} _pointer Current index of member _items at which points the Model
+	 */
+	_pointer: null,
+	
+	/** 
+ 	 * @param {?Array.<Object>} items
+	 */
+	init: function (items) {
+		this._items = items || [];
+	},
+	getItems: function () {
+		return this._items;
+	},
+	addItem: function (item) {
+		this._items.push(item);
+		EventSpeakerClass.dispatch(Model.ADD_EVT, {Model: this});
+	},
+	removeItemAt: function (index) {
+		var self = this,
+			lenBefore = this._items.length,
+			event = {
+				data: {
+					index: index,
+					model: self
+				}
+			};
+		this._items.splice(index, 1);
+		if (this._items.length === lenBefore) {
+			EventSpeakerClass.dispatch(Model.ERR_REMOVE_EVT, event);
+		} else {
+			EventSpeakerClass.dispatch(Model.REMOVE_EVT, event);
+		}
+	},
+	current: function () {
+		return this._items[this._pointer];
+	}
+});
+
+/**
+ *
+ * MODEL EVENT CODES 
+ * 0-99 INFO
+ */
+Model.ADD_EVT = 0;
+Model.REMOVE_EVT = 1;
+/**
+ * 100-199 ERROR
+ */
+Model.ERR_ADD_EVT = 100;
+Model.ERR_REMOVE_EVT = 101;
+
+Controller = function () {
+	
+};
+
+View = function () {
+	
+};

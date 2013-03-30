@@ -1,5 +1,15 @@
-var RobotModel = ArrayListModel.extend({
-	rivalId: null,
+/**
+ * @class RobotClass
+ * @property {Number} id
+ * @property life
+ * @property att
+ * @property def
+ * @property lowerDef
+ * @property upperDef
+ * @property delay
+ */
+var RobotClass = Class.extend({
+    rivalId: null,
     /**
      * @constructor
      */
@@ -14,7 +24,7 @@ var RobotModel = ArrayListModel.extend({
     },
     attack: function (rivalId, zone) {
     	console.log('rivalId: "' + rivalId + '" zone: "' + zone + '"');
-    	var rival = RobotModel.find(rivalId),
+    	var rival = RobotClass.find(rivalId),
     		damage;
     	switch (zone) {
 		case 'lower':
@@ -53,7 +63,7 @@ var RobotModel = ArrayListModel.extend({
      */
     exec: function (cmd) {
         console.log('exec("' + cmd + '")');
-        var fn = ((RobotModel.availableCommands())[cmd] || (function () { throw new Error('Invalid command'); }()))
+        var fn = ((RobotClass.availableCommands())[cmd] || (function () { throw new Error('Invalid command'); }()))
         console.log(fn(this.id, this.rivalId));
     },
     setRivalId: function (rivalId) {
@@ -61,37 +71,36 @@ var RobotModel = ArrayListModel.extend({
     }
 });
 
-RobotModel.availableCommands = function () {
+RobotClass.availableCommands = function () {
 	var robot;
     return {
         'att upper': function (selfId, rivalId) {
-            robot = RobotModel.find(selfId);
+            robot = RobotClass.find(selfId);
             if (robot) {
             	return robot.attack(rivalId, 'upper');
             }
         },
         'att lower': function (selfId, rivalId) {
-            robot = RobotModel.find(selfId);
+            robot = RobotClass.find(selfId);
             if (robot) {
             	return robot.attack(rivalId, 'lower');
             }
         },
         'def upper': function (selfId) {
-            robot = RobotModel.find(selfId);
+            robot = RobotClass.find(selfId);
             if (robot) {
             	return robot.defend('upper');
             }
         },
         'def lower': function (selfId) {
-            robot = RobotModel.find(selfId);
+            robot = RobotClass.find(selfId);
             if (robot) {
             	return robot.defend('lower');
             }
         }
     };
 }
-
-RobotModel.find = function (id) {
+RobotClass.find = function (id) {
 	var index;
 	gGame.robots.map(function(robot, key) {
 		if (robot.id === id) {

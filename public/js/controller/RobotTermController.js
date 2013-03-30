@@ -1,10 +1,10 @@
 /**
- * @class RobotControllerClass
+ * @class RobotTermController
  * @property {HTMLTextAreaElement} input
  * @property {Number} robotId
  * @property {Boolean} isLocked
  */
-var RobotControllerClass = Class.extend({
+var RobotTermController = Class.extend({
     input: null,
     robotId: null,
     isLocked: false,

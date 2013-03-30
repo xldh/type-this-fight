@@ -188,11 +188,25 @@ EventSpeakerClass = {
     }
 };
 
-Model = Class.extend({
+Model = Class.extend({});
+/**
+ *
+ * MODEL EVENT CODES 
+ * 0-99 INFO
+ */
+Model.ADD_EVT = 0;
+Model.REMOVE_EVT = 1;
+/**
+ * 100-199 ERROR
+ */
+Model.ERR_ADD_EVT = 100;
+Model.ERR_REMOVE_EVT = 101;
+
+ArrayListModel = Class.extend({
 	/**
 	 * @member {Array.<Object>} _items A collection of objects
 	 */
-	_items: null,
+	_items: [],
 	
 	/**
 	 * @member {int} _pointer Current index of member _items at which points the Model
@@ -210,6 +224,9 @@ Model = Class.extend({
 	},
 	addItem: function (item) {
 		this._items.push(item);
+		if (this._pointer === null) {
+			this._pointer = 0;
+		}
 		EventSpeakerClass.dispatch(Model.ADD_EVT, {Model: this});
 	},
 	removeItemAt: function (index) {
@@ -232,19 +249,6 @@ Model = Class.extend({
 		return this._items[this._pointer];
 	}
 });
-
-/**
- *
- * MODEL EVENT CODES 
- * 0-99 INFO
- */
-Model.ADD_EVT = 0;
-Model.REMOVE_EVT = 1;
-/**
- * 100-199 ERROR
- */
-Model.ERR_ADD_EVT = 100;
-Model.ERR_REMOVE_EVT = 101;
 
 Controller = function () {
 	

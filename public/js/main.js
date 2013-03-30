@@ -2,10 +2,9 @@ window.onload = (function () {
     "use strict";
     window.gSocket = io.connect('', { 'sync disconnect on unload': true });
     window.gGame = {
-        askForRobotController: true,
         robots: [],
         player: {
-            robotController: {},
+            robotTermController: {},
         }
     };
     /*********************************************
@@ -93,8 +92,8 @@ window.onload = (function () {
         
         if (isPlayer) {
             console.log('Building robot controller!');
-            gGame.player.robotController = new RobotControllerClass(terminalInput.id, data.userId);
-            socket.on('commandSuccessfullyBroadcast', gGame.player.robotController._transmitCommandToRobot);
+            gGame.player.robotTermController = new RobotTermController(terminalInput.id, data.userId);
+            socket.on('commandSuccessfullyBroadcast', gGame.player.robotTermController._transmitCommandToRobot);
         } else {
             console.log(
                 'No more robot controllers available, you can watch though!'
@@ -134,7 +133,7 @@ window.onload = (function () {
                 if (e.keyCode === 13) {
                     cmd = (terminalInput.value.trim()).replace(/\n/g, '');
                     if (cmd !== '') {
-                        gGame.player.robotController.broadcastCommand(cmd);
+                        gGame.player.robotTermController.broadcastCommand(cmd);
                     }
                     clearInput(terminalInput);
                     return false;

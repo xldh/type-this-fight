@@ -1,0 +1,3 @@
+var RobotView = View.extend({
+	
+});

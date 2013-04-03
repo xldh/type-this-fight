@@ -250,10 +250,49 @@ ArrayListModel = Class.extend({
 	}
 });
 
-Controller = function () {
+Controller = Class.extend({
 	
-};
+});
 
-View = function () {
-	
-};
+View = Class.extend({
+	/**
+	 * @member {Array.<Object>} A collection of DOM elements
+	 */
+	_elements: [],
+	_lockInput: function (input) {
+		var viewContainsElement = false,
+			types = ['TextArea', 'Input'];
+		types = types.map(function (type) {
+		    return '[object HTML' + type + 'Element]';
+		});
+		
+		for (var i = 0, l = this._elements.length; i < l; i++) {
+			if (input === this._elements[i]) {
+				viewContainsElement = true;
+				break;
+			}
+		}
+		
+		if (viewContainsElement) {
+			switch (Object.prototype.toString.call(input)) {
+			case '':
+				break;
+			case '':
+				break;
+			default:
+				break;
+			}
+		} else {
+			throw new Error('View does not contain element: "' + input + '"')
+		}
+	},
+	/**
+	 *
+	 * @constructor
+     * @param {Object} elements
+	 */
+	init: function (model, elements) {
+		this._model = model;
+		this._elements = elements || [];
+	}
+});
